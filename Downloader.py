@@ -80,10 +80,12 @@ def get_urls_apartments_by_page(url_page):
 
 
 def main(start_page=1, end_page=None, filename='data.json'):
-    base_path = Path(__file__).parent
+    base_path = Path(__file__).parent.parent.joinpath('Data')
+    full_filename = base_path.joinpath(filename)
+
 
     if filename in listdir(base_path):
-        with open(base_path.joinpath(filename), 'r') as file:
+        with open(full_filename, 'r') as file:
             storage_dict = json.load(file)
     else:
         storage_dict = {}
@@ -107,7 +109,7 @@ def main(start_page=1, end_page=None, filename='data.json'):
 
                 storage_dict[url_apartment] = parse_apartment(url_apartment)
 
-    with open(base_path.joinpath(filename), 'w') as file:
+    with open(full_filename, 'w') as file:
         json.dump(storage_dict, file, ensure_ascii=False)
     print('Done!')
     print('New apartments:', len(storage_dict) - len_storage)
