@@ -32,8 +32,7 @@ def get_number_last_page():
 def find_district_field(keys):
     for i, j in enumerate(keys):
         if 'район' in j:
-            break
-    return i
+            return i
 
 
 def parse_apartment(url):
