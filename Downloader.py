@@ -4,6 +4,7 @@ import urllib
 import sqlalchemy
 import pandas as pd
 from tqdm import tqdm
+from typing import List, Set
 
 params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
                                  "SERVER=OLEG;"
@@ -12,15 +13,14 @@ params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
 engine = sqlalchemy.create_engine("mssql+pyodbc:///?odbc_connect={0}".format(params))
 
 
-def get_soup_by_url(url):
+def get_soup_by_url(url: str) -> BeautifulSoup:
     html = requests.get(url).text
     soup = BeautifulSoup(html, 'lxml')
 
     return soup
 
 
-# Получаем номер последней страницы
-def get_number_last_page():
+def get_number_last_page() -> int:
     soup = get_soup_by_url(
         'https://www.tomsk.ru09.ru/'
         'realty?type=1&otype=1&district[1]=on&district[2]=on&district[3]=on&district[4]=on&perpage=50&page=1')
@@ -29,13 +29,13 @@ def get_number_last_page():
     return number_last_page
 
 
-def find_district_field(keys):
+def find_district_field(keys: List[str]) -> int:
     for i, j in enumerate(keys):
         if 'район' in j:
             return i
 
 
-def parse_apartment(url):
+def parse_apartment(url: str) -> dict:
     soup = get_soup_by_url(url)
 
     keys = [i.find('span').text.replace('\xa0', '').lower() for i in
@@ -60,7 +60,7 @@ def parse_apartment(url):
     return items
 
 
-def get_urls_pages(start_page=1, end_page=None):
+def get_urls_pages(start_page: int=1, end_page: int=None) -> Set[str]:
     url_base = 'https://www.tomsk.ru09.ru/' \
                'realty?type=1&otype=1&district[1]=on&district[2]=on&district[3]=on&district[4]=on&perpage=50&page='
 
@@ -71,7 +71,7 @@ def get_urls_pages(start_page=1, end_page=None):
     return urls_pages
 
 
-def get_urls_apartments_by_page(url_page):
+def get_urls_apartments_by_page(url_page: str) -> Set[str]:
     url_base = 'https://www.tomsk.ru09.ru'
 
     soup = get_soup_by_url(url_page)
@@ -82,7 +82,7 @@ def get_urls_apartments_by_page(url_page):
     return urls_apartments
 
 
-def main(start_page=1, end_page=None):
+def main(start_page: int=1, end_page: int=None) -> None:
     rename_map = {'район': 'District',
                   'адрес': 'Address',
                   'вид': 'Sales_Type',
@@ -113,7 +113,7 @@ def main(start_page=1, end_page=None):
     print('Apartments in storage:', len_storage, '\n')
 
     urls_pages = get_urls_pages(start_page, end_page)
-    for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True, ):
+    for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True):
         urls_apartments = get_urls_apartments_by_page(url_page)
         urls_apartments_to_parse = urls_apartments.difference(urls_in_database)
 
