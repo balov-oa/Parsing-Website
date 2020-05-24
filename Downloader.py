@@ -1,10 +1,13 @@
 import requests
-from bs4 import BeautifulSoup
+import logging
 import urllib
 import sqlalchemy
 import pandas as pd
 from tqdm import tqdm
+from bs4 import BeautifulSoup
 from typing import List, Set
+from pathlib import Path
+
 
 params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
                                  "SERVER=OLEG;"
@@ -111,7 +114,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
 
     len_storage = len(urls_in_database)
     print('Apartments in storage:', len_storage, '\n')
-
+    logging.info('Apartments in storage: {0}'.format(len_storage))
     urls_pages = get_urls_pages(start_page, end_page)
     for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True):
         urls_apartments = get_urls_apartments_by_page(url_page)
@@ -125,7 +128,20 @@ def main(start_page: int=1, end_page: int=None) -> None:
         df.rename(columns=rename_map, inplace=True)
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
     print('New Apartments:', len(df))
+    logging.info('New Apartments:{0}'.format(len(df)))
 
 
 if __name__ == '__main__':
-    main()
+    log_file = Path(__file__).parent.joinpath('log.txt')
+    logging.basicConfig(
+        format="[%(asctime)s] -- %(levelname).3s -- %(message)s",
+        datefmt='%Y.%m.%d %H:%M:%S',
+        level=logging.INFO,
+        filename=log_file)
+
+    logging.info("Download start")
+    try:
+        main()
+    except Exception as e:
+        logging.error(e)
+
