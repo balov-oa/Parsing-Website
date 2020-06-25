@@ -115,6 +115,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
     len_storage = len(urls_in_database)
     print('Apartments in storage:', len_storage, '\n')
     logging.info('Apartments in storage: {0}'.format(len_storage))
+
     urls_pages = get_urls_pages(start_page, end_page)
     for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True):
         urls_apartments = get_urls_apartments_by_page(url_page)
@@ -127,7 +128,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
     if not df.empty:
         df.rename(columns=rename_map, inplace=True)
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
-    print('New Apartments:', len(df))
+    print('New Apartments:{0}'.format(len(df)))
     logging.info('New Apartments:{0}'.format(len(df)))
 
 
