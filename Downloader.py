@@ -34,7 +34,7 @@ def get_number_last_page() -> int:
 
 def find_district_field(keys: List[str]) -> int:
     for i, j in enumerate(keys):
-        if 'район' in j:
+        if ' район' in j:
             return i
 
 
