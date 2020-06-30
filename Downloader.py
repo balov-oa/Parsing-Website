@@ -128,6 +128,8 @@ def main(start_page: int=1, end_page: int=None) -> None:
     if not df.empty:
         df.rename(columns=rename_map, inplace=True)
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
+        engine.execute('UPDATE Last_download SET Last_download_timestamp = CURRENT_TIMESTAMP')
+
     print('New Apartments:{0}'.format(len(df)))
     logging.info('New Apartments:{0}'.format(len(df)))
 
@@ -145,4 +147,3 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         logging.error(e)
-
