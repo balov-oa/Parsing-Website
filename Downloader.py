@@ -7,6 +7,7 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup
 from typing import List, Set
 from pathlib import Path
+from datetime import datetime as dt
 
 
 params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
@@ -127,8 +128,8 @@ def main(start_page: int=1, end_page: int=None) -> None:
 
     if not df.empty:
         df.rename(columns=rename_map, inplace=True)
+        df['Download_timestamp'] = dt.now()
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
-        engine.execute('UPDATE Last_download SET Last_download_timestamp = CURRENT_TIMESTAMP')
 
     print('New Apartments:{0}'.format(len(df)))
     logging.info('New Apartments:{0}'.format(len(df)))
