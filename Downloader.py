@@ -123,9 +123,8 @@ def main(start_page: int=1, end_page: int=None) -> None:
         urls_apartments = get_urls_apartments_by_page(url_page)
         urls_apartments_to_parse.update(urls_apartments.difference(urls_in_database))
 
-    if len(urls_apartments_to_parse) != 0:
-        for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
-            df = df.append(parse_apartment(url_apartment), ignore_index=True)
+    for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
+        df = df.append(parse_apartment(url_apartment), ignore_index=True)
 
     if not df.empty:
         df.rename(columns=rename_map, inplace=True)
