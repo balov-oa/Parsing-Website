@@ -118,14 +118,13 @@ def main(start_page: int=1, end_page: int=None) -> None:
     logging.info('Apartments in storage: {0}'.format(len_storage))
 
     urls_pages = get_urls_pages(start_page, end_page)
-    urls_apartments_to_parse = set()
     for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True):
         urls_apartments = get_urls_apartments_by_page(url_page)
-        urls_apartments_to_parse.update(urls_apartments.difference(urls_in_database))
+        urls_apartments_to_parse = urls_apartments.difference(urls_in_database)
 
-    for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
-        df = df.append(parse_apartment(url_apartment), ignore_index=True)
-
+        if len(urls_apartments_to_parse) != 0:
+            for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
+                df = df.append(parse_apartment(url_apartment), ignore_index=True)
     if not df.empty:
         df.rename(columns=rename_map, inplace=True)
         df['Download_timestamp'] = dt.now()
