@@ -127,6 +127,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
             for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
                 df = df.append(parse_apartment(url_apartment), ignore_index=True)
     if not df.empty:
+        df.drop_duplicates(inplace=True)
         df.rename(columns=rename_map, inplace=True)
         df['Download_timestamp'] = dt.now()
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
