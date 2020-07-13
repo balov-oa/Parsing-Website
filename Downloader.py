@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from typing import List, Set
 from pathlib import Path
 from datetime import datetime as dt
+session = requests.Session()
 
 
 params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
@@ -18,7 +19,7 @@ engine = sqlalchemy.create_engine("mssql+pyodbc:///?odbc_connect={0}".format(par
 
 
 def get_soup_by_url(url: str) -> BeautifulSoup:
-    html = requests.get(url).text
+    html = session.get(url).text
     soup = BeautifulSoup(html, 'lxml')
 
     return soup
@@ -122,7 +123,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
         urls_apartments = get_urls_apartments_by_page(url_page)
         urls_apartments_to_parse = urls_apartments.difference(urls_in_database)
 
-        if len(urls_apartments_to_parse) != 0:
+        if urls_apartments_to_parse:
             for url_apartment in tqdm(urls_apartments_to_parse, desc='Apartments', leave=False, ascii=True):
                 df = df.append(parse_apartment(url_apartment), ignore_index=True)
     if not df.empty:
@@ -130,8 +131,8 @@ def main(start_page: int=1, end_page: int=None) -> None:
         df['Download_timestamp'] = dt.now()
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
 
-    print('New Apartments:{0}'.format(len(df)))
-    logging.info('New Apartments:{0}'.format(len(df)))
+    print('New Apartments:{0}'.format(len(df.index)))
+    logging.info('New Apartments:{0}'.format(len(df.index)))
 
 
 if __name__ == '__main__':
@@ -139,7 +140,7 @@ if __name__ == '__main__':
     logging.basicConfig(
         format="[%(asctime)s] -- %(levelname).3s -- %(message)s",
         datefmt='%Y.%m.%d %H:%M:%S',
-        level=logging.INFO,
+        level=logging.DEBUG,
         filename=log_file)
 
     logging.info("Download start")
