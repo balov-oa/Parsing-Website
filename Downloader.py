@@ -15,7 +15,7 @@ params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
                                  "SERVER=OLEG;"
                                  "DATABASE=Apartment_Tomsk;"
                                  "Trusted_Connection=yes")
-engine = sqlalchemy.create_engine("mssql+pyodbc:///?odbc_connect={0}".format(params))
+engine = sqlalchemy.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
 
 
 def get_soup_by_url(url: str) -> BeautifulSoup:
@@ -116,7 +116,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
 
     len_storage = len(urls_in_database)
     print('Apartments in storage:', len_storage, '\n')
-    logging.info('Apartments in storage: {0}'.format(len_storage))
+    logging.info(f'Apartments in storage: {len_storage}')
 
     urls_pages = get_urls_pages(start_page, end_page)
     for url_page in tqdm(urls_pages, desc='Pages', leave=False, ascii=True):
@@ -132,8 +132,9 @@ def main(start_page: int=1, end_page: int=None) -> None:
         df['Download_timestamp'] = dt.now()
         df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
 
-    print('New Apartments:{0}'.format(len(df.index)))
-    logging.info('New Apartments:{0}'.format(len(df.index)))
+    new_apartments = len(df.index)
+    print(f'New Apartments:{new_apartments}')
+    logging.info(f'New Apartments:{new_apartments}')
 
 
 if __name__ == '__main__':
