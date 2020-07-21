@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from typing import List, Set
 from pathlib import Path
 from datetime import datetime as dt
+from random import randint
 
 
 session = requests.Session()
@@ -135,14 +136,15 @@ def main(start_page: int=1, end_page: int=None) -> None:
                         f.write(f'{url_apartment} -- {E}\n')
                         logging.error(E)
                 finally:
-                    time.sleep(2)
+                    time.sleep(randint(0, 4))
             df = df.append(list_to_dataframe, ignore_index=True)
+            time.sleep(randint(0, 4))
 
     if not df.empty:
         df.drop_duplicates(inplace=True)
         df.rename(columns=rename_map, inplace=True)
         df['Download_timestamp'] = dt.now()
-        # df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
+        df.to_sql(name='Apartments', con=engine, schema='dbo', if_exists='append', index=False)
 
     new_apartments = len(df.index)
     print(f'New Apartments:{new_apartments}')
