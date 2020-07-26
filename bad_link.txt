@@ -1,1 +1,0 @@
-https://www.tomsk.ru09.ru/realty?subactiqwerqweason=detail&id=4475033 -- list indices must be integers or slices, not NoneType

@@ -1,16 +1,16 @@
-import requests
 import logging
-import urllib
-import sqlalchemy
-import pandas as pd
 import time
-from tqdm import tqdm
-from bs4 import BeautifulSoup
-from typing import List, Set
-from pathlib import Path
+import urllib
 from datetime import datetime as dt
+from pathlib import Path
 from random import randint
+from typing import List, Set
 
+import pandas as pd
+import requests
+import sqlalchemy
+from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 session = requests.Session()
 params = urllib.parse.quote_plus("DRIVER={SQL Server Native Client 11.0};"
@@ -30,8 +30,10 @@ def get_soup_by_url(url: str) -> BeautifulSoup:
 def get_number_last_page() -> int:
     soup = get_soup_by_url(
         'https://www.tomsk.ru09.ru/'
-        'realty?type=1&otype=1&district[1]=on&district[2]=on&district[3]=on&district[4]=on&perpage=50&page=1')
-    number_last_page = int(soup.find('td', {'class': 'pager_pages'}).find_all('a')[4].text)
+        'realty?type=1&otype=1&district[1]=on&district[2]=on&district[3]'
+        '=on&district[4]=on&perpage=50&page=1')
+    number_last_page = int(soup.find('td', {'class': 'pager_pages'}).
+                           find_all('a')[4].text)
 
     return number_last_page
 
@@ -44,7 +46,6 @@ def find_district_field(keys: List[str]) -> int:
 
 def parse_apartment(url: str) -> dict:
     soup = get_soup_by_url(url)
-
 
     keys = [i.find('span').text.replace('\xa0', '').lower() for i in
             soup.find_all('tr', {'class': 'realty_detail_attr'})]
@@ -138,7 +139,7 @@ def main(start_page: int=1, end_page: int=None) -> None:
                 finally:
                     time.sleep(randint(0, 4))
             df = df.append(list_to_dataframe, ignore_index=True)
-            time.sleep(randint(0, 4))
+        time.sleep(randint(0, 4))
 
     if not df.empty:
         df.drop_duplicates(inplace=True)
