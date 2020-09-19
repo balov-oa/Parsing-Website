@@ -1,0 +1,2 @@
+https://www.tomsk.ru09.ru/realty?subaction=detail&id=4499551 -- ('Connection aborted.', OSError("(10060, 'WSAETIMEDOUT')"))
+https://www.tomsk.ru09.ru/realty?subaction=detail&id=4499549 -- list indices must be integers or slices, not NoneType
